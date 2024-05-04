@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use axum::body::Bytes;
 use axum::extract::{Multipart, Path};
+use axum::response::IntoResponse;
 use axum_macros::debug_handler;
 use clap::{Parser, ValueEnum};
 use serde::Serialize;
@@ -33,7 +34,7 @@ struct InputFileInfo {
     pub async fn handler_convert_file(
         Path(output_format): Path<String>,
         multipart: Multipart,
-    ) -> Result<DownloadFile> {
+    ) -> impl IntoResponse {
         println!("-->> {:<12} - handler_convert_file - output_extension_{output_format}", "HANDLER");
 
         let data_uploaded_file = upload_file(multipart).await.unwrap();
