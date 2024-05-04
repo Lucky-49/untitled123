@@ -1,11 +1,13 @@
 use std::collections::HashMap;
 use axum::body::Bytes;
 use axum::extract::{Multipart, Path};
+use axum_macros::debug_handler;
 use clap::{Parser, ValueEnum};
 use serde::Serialize;
 use shiva::core::{Document, TransformerTrait};
 use crate::error::{Error, Result};
 
+#[derive(Debug, Clone)]
 pub struct DownloadFile {
     file_name: String,
     file_data: (Bytes, HashMap<String, Bytes>),
@@ -27,7 +29,7 @@ struct InputFileInfo {
 }
 
 
-
+#[debug_handler]
     pub async fn handler_convert_file(
         Path(output_format): Path<String>,
         multipart: Multipart,
@@ -57,13 +59,13 @@ async fn convert_file(
         "md" => Document::from(
             shiva::markdown::Transformer::parse(&input_file_data_bytes, &HashMap::new())
                 .unwrap()),
-
+//we scale the code to other acceptable formats
         _ => return Err(Error::FailParseDocument),
     };
 
     let output_file_bytes = match output_format.as_str() {
         "md" => shiva::markdown::Transformer::generate(&document).unwrap(),
-
+//we scale the code to other acceptable formats
         _ => return Err(Error::FailConvertFile),
     };
 
@@ -102,7 +104,7 @@ async fn upload_file(mut multipart: Multipart) -> Result<InputFileInfo> {
             }
         }
     }
-    let file_name = file_name.unwrap_or("Schiva_convert".to_string());
+    let file_name = file_name.unwrap_or("Shiva_convert".to_string());
     let file_extension = file_extension.ok_or("File extension not found").unwrap();
     let file_data = file_data;
 
